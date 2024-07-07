@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Data</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>User Data</h1>
+    </header>
+    
+    <main>
+        <section class="user-data">
+            <h2>Registered Users</h2>
+            <ul id="userList"></ul>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 ShopEase. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userList = document.getElementById('userList');
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            users.forEach((user, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `Username: ${user.username}, Phone: ${user.phone} 
+                                <button onclick="deleteUser(${index})">Delete</button>
+                                <button onclick="addUser(${index})">Add</button>`;
+                userList.appendChild(li);
+            });
+        });
+
+        function deleteUser(index) {
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            users.splice(index, 1); // Remove the user at the specified index
+            localStorage.setItem('users', JSON.stringify(users));
+            window.location.reload(); // Reload the page to reflect the changes
+        }
+
+        function addUser(index) {
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users[index];
+            
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            students.push(user);
+            localStorage.setItem('students', JSON.stringify(students));
+            
+            window.location.href = 'student.html';
+        }
+    </script>
+</body>
+</html>

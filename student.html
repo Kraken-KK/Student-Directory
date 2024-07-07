@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Data</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            animation: slideIn 1s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        h1, h2 {
+            margin: 0;
+        }
+        h1 {
+            font-size: 2.5em;
+        }
+        h2 {
+            font-size: 1.5em;
+        }
+        .container {
+            padding: 20px;
+            text-align: center;
+            animation: fadeIn 1.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .student-card {
+            position: relative;
+            border-radius: 15px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin: 20px auto;
+            width: 300px;
+            text-align: center;
+            background-color: #fff;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: bounceIn 1s ease-out;
+        }
+        @keyframes bounceIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .student-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .student-card img {
+            border-radius: 15px;
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .student-card h3, .student-card p {
+            margin: 10px 0;
+        }
+        .student-card h3 {
+            font-family: 'Georgia', serif;
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+        .student-card p {
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            color: #333;
+            font-size: 1.2em;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .overlay .popup {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            animation: popupIn 0.5s ease-out;
+        }
+        @keyframes popupIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .overlay .popup input {
+            display: block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Student Data</h1>
+        <h2>IX A</h2>
+    </header>
+    
+    <main class="container" id="studentContainer">
+        <!-- Student cards will be added here dynamically -->
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 ShopEase. All rights reserved.</p>
+    </footer>
+
+    <div class="overlay" id="overlay">
+        <div class="popup">
+            <h2>Upload Image</h2>
+            <input type="file" id="imageUpload" accept="image/*">
+            <button onclick="uploadImage()">Upload</button>
+            <button onclick="closeOverlay()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const container = document.getElementById('studentContainer');
+            
+            students.forEach((student, index) => {
+                const card = document.createElement('div');
+                card.classList.add('student-card');
+                card.dataset.index = index;
+                card.innerHTML = `
+                    <img src="${student.image || 'default-image.jpg'}" alt="Student Image" onclick="openOverlay(${index})">
+                    <h3>${student.username}</h3>
+                    <p>${student.phone}</p>
+                `;
+                container.appendChild(card);
+            });
+        });
+
+        function openOverlay(index) {
+            const overlay = document.getElementById('overlay');
+            overlay.style.display = 'flex';
+            overlay.dataset.index = index;
+        }
+
+        function closeOverlay() {
+            const overlay = document.getElementById('overlay');
+            overlay.style.display = 'none';
+        }
+
+        function uploadImage() {
+            const overlay = document.getElementById('overlay');
+            const index = overlay.dataset.index;
+            const fileInput = document.getElementById('imageUpload');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const students = JSON.parse(localStorage.getItem('students')) || [];
+                    students[index].image = e.target.result;
+                    localStorage.setItem('students', JSON.stringify(students));
+                    updateStudentCards();
+                    closeOverlay();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateStudentCards() {
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const container = document.getElementById('studentContainer');
+            container.innerHTML = '';
+
+            students.forEach((student, index) => {
+                const card = document.createElement('div');
+                card.classList.add('student-card');
+                card.dataset.index = index;
+                card.innerHTML = `
+                    <img src="${student.image || 'default-image.jpg'}" alt="Student Image" onclick="openOverlay(${index})">
+                    <h3>${student.username}</h3>
+                    <p>${student.phone}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
